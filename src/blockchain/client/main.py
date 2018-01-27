@@ -1,10 +1,11 @@
 import sys
 
-from commands.send import SendCommand
-from commands.make_address import MakeAddressCommand
-from commands.sync import SyncCommand
+from blockchain.client.commands.send import SendCommand
+from blockchain.client.commands.make_address import MakeAddressCommand
+from blockchain.client.commands.list_addresses import ListAddressesCommand
+from blockchain.client.commands.sync import SyncCommand
 
-COMMANDS = [SendCommand, MakeAddressCommand, SyncCommand]
+COMMANDS = [SendCommand, MakeAddressCommand, ListAddressesCommand, SyncCommand]
 USAGE = ' | '.join(map(lambda c : c.USAGE, COMMANDS))
 
 if __name__ == '__main__':

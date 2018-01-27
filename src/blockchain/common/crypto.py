@@ -33,7 +33,7 @@ class Crypto:
         with open(key_file_path, 'wb') as f:
             f.write(key.exportKey(self.key_format.upper()))
 
-        return self.get_key(key_name)
+        return self.get_key(key_name), key_file_path
 
     def __get_key_file_path(self, key_name):
         file_name = '{}.{}'.format(key_name, self.key_format)

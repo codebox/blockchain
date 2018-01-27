@@ -21,6 +21,10 @@ Can broadcast new blocks to network
 Can download initial blockchain
 Can mine blocks
 
+Run
+---
+python -m blockchain.client.main
+
 Links
 -----
 crypto:

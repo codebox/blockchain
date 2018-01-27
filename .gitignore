@@ -2,3 +2,5 @@
 *.pyc
 .idea
 tmp
+ENV
+*.pem

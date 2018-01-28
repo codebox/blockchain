@@ -8,5 +8,16 @@ class Transaction:
     def sign(self, signature):
         self.signature = signature
 
-    def get_unsigned_details(self):
+    def get_details_for_signature(self):
         return '{} {} {}'.format(self.from_address, str(self.amount), self.to_address)
+
+    def get_details(self):
+        return {
+            'from'      : self.from_address,
+            'to'        : self.to_address,
+            'amount'    : self.amount,
+            'signature' : self.signature
+        }
+
+    def __repr__(self):
+        return '{} --[{}]--> {}'.format(self.from_address, str(self.amount), self.to_address)

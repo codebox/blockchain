@@ -13,7 +13,7 @@ class MakeAddressCommand:
         else:
             key_name = args[0]
             try:
-                _, key_file_path = Crypto(KEY_STORE_DIR).generate_key(key_name)
-                print('Generated [{}] address, keys are saved in {}'.format(key_name, key_file_path))
+                key = Crypto(KEY_STORE_DIR).generate_key(key_name)
+                print('Generated key [{}] with address {}. Key saved in {}'.format(key.name, key.address, key.key_file_path))
             except BaseException as e:
                 print('ERROR: {}'.format(e))

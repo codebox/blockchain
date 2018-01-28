@@ -2,7 +2,7 @@ import os.path
 from glob import glob
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-from key import Key
+from blockchain.common.key import Key
 
 class Crypto:
     def __init__(self, key_dir, key_format = 'pem', key_size = 1024):

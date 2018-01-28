@@ -13,5 +13,5 @@ class ListAddressesCommand:
         else:
             keys = Crypto(KEY_STORE_DIR).get_keys()
             print("Found {} address{} in directory '{}':".format(len(keys), '' if len(keys) == 1 else 'es', KEY_STORE_DIR))
-            for name in keys.keys():
-                print('* {}'.format(name))
+            for key in keys:
+                print('* {} - {}'.format(key.name, key.address))

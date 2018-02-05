@@ -5,9 +5,6 @@ class Transaction:
         self.to_address = to_address
         self.signature = None
 
-    def sign(self, signature):
-        self.signature = signature
-
     def get_details_for_signature(self):
         return '{} {} {}'.format(self.from_address, str(self.amount), self.to_address)
 

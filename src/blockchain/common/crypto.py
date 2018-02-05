@@ -29,6 +29,11 @@ class Crypto:
                 address = self.__get_address_for_key(key)
                 return Key(key_name, key, file_path, address)
 
+    def get_key_by_address(self, key_address):
+        for key in self.get_keys():
+            if key.address == key_address:
+                return key
+
     def get_keys(self):
         keys = []
         for file_path in glob(os.path.join(self.key_dir, '*.{}'.format(self.key_format))):

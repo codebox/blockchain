@@ -2,8 +2,8 @@ Client
 ------
 ● Can generate addresses (with public/private key pair)
 
-◯ Can create new transactions
-◯ Can sign transaction with private key
+● Can create new transactions
+● Can sign transaction with private key
 ◯ Can broadcast new transactions to network
 
 ◯ Can download initial blockchain

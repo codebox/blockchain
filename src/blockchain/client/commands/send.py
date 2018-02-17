@@ -2,7 +2,7 @@ from blockchain.common.transaction import Transaction
 from blockchain.common.network import Network
 from blockchain.common.blockchain import Blockchain
 from blockchain.common.crypto import Crypto
-from blockchain.common.encoders import transaction_encode
+from blockchain.common.encoders import transaction_encode, text_to_bytes
 
 import re
 
@@ -48,10 +48,11 @@ class SendCommand:
                         transaction_data_to_sign = transaction.get_details_for_signature()
                         transaction.signature = key.sign(transaction_data_to_sign)
 
-                        encoded_transaction = transaction_encode(transaction.get_details())
+                        encoded_transaction_text = transaction_encode(transaction.get_details())
+                        encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
 
                         net = Network()
-                        net.send(encoded_transaction)
+                        net.send_transaction(encoded_transaction_bytes)
 
     def _is_valid_address_format(self, address_candidate):
         return ADDRESS_PATTERN.match(address_candidate)

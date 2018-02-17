@@ -1,3 +1,5 @@
+from blockchain.common.encoders import text_to_bytes
+
 class Key:
     K = ''
 
@@ -9,7 +11,7 @@ class Key:
 
     def __prepare_data_for_signing(self, data):
         if isinstance(data, str):
-            return data.encode('UTF-8')
+            return text_to_bytes(data)
         return data
 
     def sign(self, unsigned_data):

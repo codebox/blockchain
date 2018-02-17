@@ -4,7 +4,7 @@ Client
 
 ● Can create new transactions
 ● Can sign transaction with private key
-◯ Can broadcast new transactions to network
+● Can broadcast new transactions to network
 
 ◯ Can download initial blockchain
 ◯ Can download blockchain updates
@@ -15,7 +15,7 @@ Miner
 -----
 ◯ Can generate addresses (with public/private key pair)
 ◯ Can create mining reward transactions
-◯ Can receive new transaction broadcasts from clients
+● Can receive new transaction broadcasts from clients
 ◯ Can receive new block broadcasts from other miners
 ◯ Can broadcast new blocks to network
 ◯ Can download initial blockchain
@@ -25,6 +25,7 @@ Run
 ---
 cd src
 python -m blockchain.client.main
+python -m blockchain.miner.main
 
 Links
 -----

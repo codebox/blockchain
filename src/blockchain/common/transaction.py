@@ -10,10 +10,10 @@ class Transaction:
 
     def get_details(self):
         return {
-            'from'      : self.from_address,
-            'to'        : self.to_address,
-            'amount'    : self.amount,
-            'signature' : self.signature
+            'from_address' : self.from_address,
+            'to_address'   : self.to_address,
+            'amount'       : self.amount,
+            'signature'    : self.signature
         }
 
     def __repr__(self):

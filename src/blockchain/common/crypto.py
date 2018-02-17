@@ -3,6 +3,7 @@ from glob import glob
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from blockchain.common.key import Key
+from blockchain.common.encoders import text_to_bytes
 
 class Crypto:
     def __init__(self, key_dir, key_format = 'pem', key_size = 1024):
@@ -16,7 +17,7 @@ class Crypto:
 
     @staticmethod
     def hash_string(text):
-        return hash(text.encode('UTF-8'))
+        return hash(text_to_bytes(text))
 
     def __get_address_for_key(self, key):
         return Crypto.hash(key.publickey().exportKey(self.key_format.upper()))

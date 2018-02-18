@@ -44,7 +44,7 @@ def block_encode(block):
 def transaction_decode(transaction_data):
     obj = json.loads(transaction_data)
 
-    transaction = Transaction(obj['from_address'], obj['amount'], obj['to_address'])
+    transaction = Transaction(obj['from_address'], obj['amount'], obj['to_address'], obj['public_key'])
     transaction.signature = obj['signature'];
     return transaction
 

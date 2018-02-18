@@ -3,7 +3,9 @@ from glob import glob
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from blockchain.common.key import Key
-from blockchain.common.encoders import text_to_bytes
+from blockchain.common.hash import hash_to_hex
+from base64 import b64decode
+
 
 class Crypto:
     def __init__(self, key_dir, key_format = 'pem', key_size = 1024):
@@ -12,15 +14,12 @@ class Crypto:
         self.key_size   = key_size
 
     @staticmethod
-    def hash(data):
-        return SHA256.new(data).hexdigest()
-
-    @staticmethod
-    def hash_string(text):
-        return hash(text_to_bytes(text))
+    def validate_signature(data, public_key, signature):
+        public_key = RSA.importKey(public_key)
+        return Key(None, public_key, None, None).verify(data, signature)
 
     def __get_address_for_key(self, key):
-        return Crypto.hash(key.publickey().exportKey(self.key_format.upper()))
+        return hash_to_hex(key.publickey().exportKey(self.key_format.upper()))
 
     def get_key(self, key_name):
         file_path = self.__get_key_file_path(key_name)

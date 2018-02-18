@@ -44,7 +44,7 @@ class SendCommand:
                         print('insufficient funds')
 
                     else:
-                        transaction = Transaction(from_address, amount, to_address)
+                        transaction = Transaction(from_address, amount, to_address, key.get_public_key())
                         transaction_data_to_sign = transaction.get_details_for_signature()
                         transaction.signature = key.sign(transaction_data_to_sign)
 

@@ -1,8 +1,9 @@
 class Transaction:
-    def __init__(self, from_address, amount, to_address):
+    def __init__(self, from_address, amount, to_address, public_key):
         self.from_address = from_address
         self.amount = amount
         self.to_address = to_address
+        self.public_key = public_key
         self.signature = None
 
     def get_details_for_signature(self):
@@ -13,6 +14,7 @@ class Transaction:
             'from_address' : self.from_address,
             'to_address'   : self.to_address,
             'amount'       : self.amount,
+            'public_key'   : self.public_key,
             'signature'    : self.signature
         }
 

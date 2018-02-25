@@ -2,7 +2,8 @@ from blockchain.common.transaction import Transaction
 from blockchain.common.network import Network
 from blockchain.common.blockchain import Blockchain
 from blockchain.common.crypto import Crypto
-from blockchain.common.encoders import transaction_encode, text_to_bytes
+from blockchain.common.encoders import transaction_encode
+from blockchain.common.utils import text_to_bytes
 
 import re
 

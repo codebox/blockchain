@@ -1,4 +1,4 @@
-from blockchain.common.encoders import text_to_bytes, bytes_to_text
+from blockchain.common.utils import text_to_bytes, bytes_to_text
 from blockchain.common.hash import hash
 
 class Key:

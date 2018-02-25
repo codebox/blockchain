@@ -1,4 +1,3 @@
-from blockchain.common.encoders import text_to_bytes
 from socket import *
 
 TRANSACTION_PORT = 2606

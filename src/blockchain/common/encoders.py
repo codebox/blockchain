@@ -4,14 +4,6 @@ from blockchain.common.transaction import Transaction
 
 import json
 
-TEXT_ENCODING = 'UTF-8'
-
-def text_to_bytes(text):
-    return text.encode(TEXT_ENCODING)
-
-def bytes_to_text(bytes):
-    return bytes.decode(TEXT_ENCODING)
-
 def blockchain_decode(blockchain_data):
     obj = json.loads(blockchain_data)
 

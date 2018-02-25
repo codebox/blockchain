@@ -1,5 +1,5 @@
 from Crypto.Hash import SHA256
-from blockchain.common.encoders import text_to_bytes
+from blockchain.common.utils import text_to_bytes
 
 def hash(data):
     return SHA256.new(data).digest()

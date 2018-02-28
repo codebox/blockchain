@@ -21,7 +21,7 @@ class SendCommand:
             from_address_or_key, amount_txt, to_address = args
 
             crypto = Crypto()
-            key = crypto.get_key(from_address_or_key) or crypto.get_key(from_address_or_key)
+            key = crypto.get_key(from_address_or_key) or crypto.get_key_by_address(from_address_or_key)
 
             if not key:
                 print('invalid from address/key')

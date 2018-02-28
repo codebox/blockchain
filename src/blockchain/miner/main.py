@@ -9,6 +9,7 @@ from blockchain.common.block import Block
 from blockchain.miner.miner import Miner
 from blockchain.common.hash import hash_to_hex
 from blockchain.common.config import config
+import signal, sys
 
 class MiningServer:
     def __init__(self, mining_thread_count):
@@ -17,7 +18,12 @@ class MiningServer:
         self.mining_threads = []
         self.work_queue = Queue()
 
+    def _quit(self, signal, frame):
+        print("Stopping")
+        sys.exit(0)
+
     def start(self):
+        signal.signal(signal.SIGINT, self._quit)
         for id in range(self.mining_thread_count):
             t = Thread(target=self.mine_block, args=(id,), daemon=True)
             self.mining_threads.append(t)

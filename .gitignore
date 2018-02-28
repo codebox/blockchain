@@ -4,3 +4,4 @@
 tmp
 ENV
 *.pem
+blockchain.json

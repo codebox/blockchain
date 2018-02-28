@@ -4,41 +4,66 @@ from blockchain.common.transaction import Transaction
 
 import json
 
-def blockchain_decode(blockchain_data):
-    obj = json.loads(blockchain_data)
+def blockchain_decode(blockchain_json):
+    blockchain_dict = json.loads(blockchain_json)
 
     blockchain = Blockchain()
-    for obj_child in obj:
-        block = block_decode(obj_child)
+    for block_dict in blockchain_dict['blocks']:
+        block = block_from_dict(block_dict)
         blockchain.blocks.append(block)
 
     return blockchain
 
+def blockchain_to_dict(blockchain):
+    return {'blocks' : list(map(block_to_dict, blockchain.blocks))}
 
 def blockchain_encode(blockchain):
-    return json.dumps([block_encode(block) for block in blockchain])
+    blockchain_dict = blockchain_to_dict(blockchain)
+    return json.dumps(blockchain_dict)
 
-def block_decode(block_data):
-    obj = json.loads(block_data)
+def block_from_dict(block_dict):
+    block = Block()
+    block.id = block_dict['id']
+    block.previous_block_id = block_dict['previous_block_id']
+    block.transactions = list(map(transaction_from_dict, block_dict['transactions']))
+    block.nonce = block_dict['nonce']
+    return block
 
-    if obj.get('transactions') and obj.get('nonce'):
-        block = Block()
+def block_to_dict(block):
+    return {
+        'id' : block.id,
+        'previous_block_id' : block.previous_block_id,
+        'transactions' : list(map(transaction_to_dict, block.transactions)),
+        'nonce' : block.nonce
+    }
 
-        block.transactions = map(transaction_decode, obj.get('transactions'))
-        block.nonce = obj.get('nonce')
-
-        return block
+def block_decode(block_json):
+    block_dict = json.loads(block_json)
+    return block_from_dict(block_dict)
 
 def block_encode(block):
-    return json.dumps({'transactions' : map(transaction_encode, block.transactions), 'nonce' : block.nonce})
+    return json.dumps(block_to_dict(block))
 
 
-def transaction_decode(transaction_data):
-    obj = json.loads(transaction_data)
+def transaction_from_dict(transaction_dict):
+    transaction = Transaction(transaction_dict['from_address'], transaction_dict['amount'],
+        transaction_dict['to_address'], transaction_dict['public_key'])
 
-    transaction = Transaction(obj['from_address'], obj['amount'], obj['to_address'], obj['public_key'])
-    transaction.signature = obj['signature'];
+    transaction.signature = transaction_dict['signature']
     return transaction
 
+def transaction_to_dict(transaction):
+    return {
+        'from_address' : transaction.from_address,
+        'amount'       : transaction.amount,
+        'to_address'   : transaction.to_address,
+        'public_key'   : transaction.public_key,
+        'signature'    : transaction.signature
+    }
+
+def transaction_decode(transaction_json):
+    transaction_dict = json.loads(transaction_json)
+    return transaction_from_dict(transaction_dict)
+
 def transaction_encode(transaction):
-    return json.dumps(transaction)
+    return json.dumps(transaction_to_dict(transaction))

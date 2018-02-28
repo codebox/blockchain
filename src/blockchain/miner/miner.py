@@ -1,7 +1,6 @@
 import math
-import codecs
-from blockchain.common.hash import hash
-from blockchain.common.utils import bytes_to_hex
+from blockchain.common.hash import hash_string
+from blockchain.common.encoders import block_encode
 
 class Miner:
     def __init__(self, leading_zero_bits):
@@ -25,18 +24,17 @@ class Miner:
         nonce = 0
         while True:
             block.nonce = nonce
-            block_bytes = block.to_bytes()
 
-            hash_as_bytes = hash(block_bytes)
-
+            hash_as_bytes = hash_string(block_encode(block))
             leading_zero_bits = self.count_leading_zero_bits_in_bytes(hash_as_bytes)
+
             if leading_zero_bits >= self.required_leading_zero_bits:
                 return nonce
 
             nonce += 1
 
     def is_mined(self, block):
-        block_hash_bytes = hash(block.to_bytes())
+        block_hash_bytes = hash_string(block_encode(block))
         leading_zero_bits = self.count_leading_zero_bits_in_bytes(block_hash_bytes)
         return leading_zero_bits >= self.required_leading_zero_bits
 

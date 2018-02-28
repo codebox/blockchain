@@ -45,7 +45,7 @@ class SendCommand:
                     transaction_data_to_sign = transaction.get_details_for_signature()
                     transaction.signature = key.sign(transaction_data_to_sign)
 
-                    encoded_transaction_text = transaction_encode(transaction.get_details())
+                    encoded_transaction_text = transaction_encode(transaction)
                     encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
 
                     net = Network()

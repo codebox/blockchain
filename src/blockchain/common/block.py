@@ -4,7 +4,9 @@ from blockchain.common.config import config
 class Block:
     def __init__(self):
         self.transactions = []
-        self.nonce = []
+        self.nonce = None
+        self.previous_block_id = None
+        self.id = None
 
     def is_mineable(self):
         return len(self.transactions) == config.get('block_size')
@@ -14,6 +16,3 @@ class Block:
 
     def set_nonce(self, nonce):
         self.nonce = nonce
-
-    def to_bytes(self):
-        return text_to_bytes('|'.join([str(t.get_details()) for t in self.transactions] + [str(self.nonce)]))

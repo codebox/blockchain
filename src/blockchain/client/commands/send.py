@@ -8,7 +8,6 @@ from blockchain.common.utils import text_to_bytes
 import re
 
 ADDRESS_PATTERN = re.compile('^[a-f0-9]{64}$')
-KEY_STORE_DIR = '.' # TODO repeated
 
 class SendCommand:
     NAME  = 'send'
@@ -19,10 +18,13 @@ class SendCommand:
             print('wrong number of args for {}'.format(SendCommand.NAME))
 
         else:
-            from_address, amount_txt, to_address = args
+            from_address_or_key, amount_txt, to_address = args
 
-            if not self._is_valid_address_format(from_address):
-                print('invalid from address')
+            crypto = Crypto()
+            key = crypto.get_key(from_address_or_key) or crypto.get_key(from_address_or_key)
+
+            if not key:
+                print('invalid from address/key')
 
             elif not self._is_valid_address_format(to_address):
                 print('invalid to address')
@@ -31,29 +33,23 @@ class SendCommand:
                 print('invalid amount')
 
             else:
-                key = Crypto(KEY_STORE_DIR).get_key_by_address(from_address)
+                blockchain = Blockchain()
+                balance = blockchain.get_balance_for_address(key.address)
+                amount = float(amount_txt)
 
-                if key is None: # TODO whoa nellie, too much nesting
-                    print('client does not own specified From Address')
+                if balance < amount:
+                    print('insufficient funds')
 
                 else:
-                    blockchain = Blockchain()
-                    balance = blockchain.get_balance_for_address(from_address)
-                    amount = float(amount_txt)
+                    transaction = Transaction(key.address, amount, to_address, key.get_public_key())
+                    transaction_data_to_sign = transaction.get_details_for_signature()
+                    transaction.signature = key.sign(transaction_data_to_sign)
 
-                    if balance < amount:
-                        print('insufficient funds')
+                    encoded_transaction_text = transaction_encode(transaction.get_details())
+                    encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
 
-                    else:
-                        transaction = Transaction(from_address, amount, to_address, key.get_public_key())
-                        transaction_data_to_sign = transaction.get_details_for_signature()
-                        transaction.signature = key.sign(transaction_data_to_sign)
-
-                        encoded_transaction_text = transaction_encode(transaction.get_details())
-                        encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
-
-                        net = Network()
-                        net.send_transaction(encoded_transaction_bytes)
+                    net = Network()
+                    net.send_transaction(encoded_transaction_bytes)
 
     def _is_valid_address_format(self, address_candidate):
         return ADDRESS_PATTERN.match(address_candidate)

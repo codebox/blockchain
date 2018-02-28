@@ -1,6 +1,6 @@
 from blockchain.common.crypto import Crypto
-
-KEY_STORE_DIR = '.'
+from blockchain.common.config import config
+import os
 
 class ListAddressesCommand:
     NAME  = 'list-addresses'
@@ -11,7 +11,8 @@ class ListAddressesCommand:
             print('wrong number of args for {}'.format(ListAddressesCommand.NAME))
 
         else:
-            keys = Crypto(KEY_STORE_DIR).get_keys()
-            print("Found {} address{} in directory '{}':".format(len(keys), '' if len(keys) == 1 else 'es', KEY_STORE_DIR))
+            crypto = Crypto()
+            keys = crypto.get_keys()
+            print("Found {} address{} in directory '{}':".format(len(keys), '' if len(keys) == 1 else 'es', os.path.abspath(crypto.key_store_dir)))
             for key in keys:
                 print('* {} - {}'.format(key.name, key.address))

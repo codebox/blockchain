@@ -8,8 +8,7 @@ from blockchain.common.crypto import Crypto
 from blockchain.common.block import Block
 from blockchain.miner.miner import Miner
 from blockchain.common.hash import hash_to_hex
-
-DIFFICULTY = 16
+from blockchain.common.config import config
 
 class MiningServer:
     def __init__(self, mining_thread_count):
@@ -34,7 +33,7 @@ class MiningServer:
         while True:
             unmined_block = self.work_queue.get()
             self.log('Mining thread {} active'.format(thread_id))
-            miner = Miner(DIFFICULTY)
+            miner = Miner(config.get('difficulty'))
             miner.mine(unmined_block)
             mined_block = unmined_block
             self.log('New block mined! nonce={} hash={}'.format((str(mined_block.nonce)), hash_to_hex(mined_block.to_bytes())))

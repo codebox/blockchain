@@ -1,6 +1,5 @@
 from blockchain.common.utils import text_to_bytes
-
-BLOCK_SIZE=1
+from blockchain.common.config import config
 
 class Block:
     def __init__(self):
@@ -8,7 +7,7 @@ class Block:
         self.nonce = []
 
     def is_mineable(self):
-        return len(self.transactions) == BLOCK_SIZE
+        return len(self.transactions) == config.get('block_size')
 
     def add(self, transaction):
         self.transactions.append(transaction)

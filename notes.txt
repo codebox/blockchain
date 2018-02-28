@@ -21,7 +21,7 @@ Miner
 ◯ Can broadcast new blocks to network
 ◯ Can download initial blockchain
 ◯ Can generate new blockchain
-◯ Can mine blocks
+● Can mine blocks
 
 Run
 ---
@@ -33,3 +33,6 @@ Links
 -----
 crypto:
     https://www.laurentluce.com/posts/python-and-cryptography-with-pycrypto/
+
+minimum viable blockchain properties:
+    https://www.igvita.com/2014/05/05/minimum-viable-block-chain/#properties

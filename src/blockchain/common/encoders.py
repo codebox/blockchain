@@ -44,6 +44,12 @@ def block_decode(block_json):
 def block_encode(block):
     return json.dumps(block_to_dict(block))
 
+def block_list_decode(block_list_json):
+    block_list = json.loads(block_list_json)
+    return list(map(block_from_dict, block_list))
+
+def block_list_encode(block_list):
+    return json.dumps(list(map(block_to_dict, block_list)))
 
 def transaction_from_dict(transaction_dict):
     transaction = Transaction(transaction_dict['from_address'], transaction_dict['amount'],
@@ -67,3 +73,9 @@ def transaction_decode(transaction_json):
 
 def transaction_encode(transaction):
     return json.dumps(transaction_to_dict(transaction))
+
+def block_ids_decode(block_json):
+    return json.loads(block_json)
+
+def block_ids_encode(block_list):
+    return json.dumps(block_list)

@@ -3,7 +3,7 @@ from queue import Queue
 import logging
 
 from blockchain.common.network import Network
-from blockchain.common.encoders import transaction_decode, block_encode
+from blockchain.common.encoders import transaction_decode, block_encode, block_list_encode
 from blockchain.common.utils import bytes_to_text, text_to_bytes
 from blockchain.common.crypto import Crypto
 from blockchain.common.block import Block
@@ -35,7 +35,9 @@ class MiningServer:
             self.mining_threads.append(t)
             t.start()
 
-        Network().receive_transaction(self.on_transaction)
+        #TODO sort out this mess
+        Thread(target=self.listen_for_new_block_requests, daemon=True).start()
+        Network().receive_transactions(self.on_transaction)
 
     def mine_block(self, thread_id):
         logging.info('Mining thread {} started'.format(thread_id))
@@ -52,6 +54,18 @@ class MiningServer:
 
     def format_address(self, address):
         return address[:12] + '...'
+
+    def listen_for_new_block_requests(self):
+        Network().receive_block_requests(self.on_block_request)
+
+    def on_block_request(self, connection, request_bytes):
+        block_id = bytes_to_text(request_bytes)
+        new_blocks = self.blockchain.get_blocks_following(block_id)
+        new_blocks_json = block_list_encode(new_blocks)
+        new_blocks_bytes = text_to_bytes(new_blocks_json)
+        connection.send(new_blocks_bytes)
+        connection.close()
+        logging.info('Sent {} new blocks'.format(len(new_blocks)))
 
     def on_transaction(self, transaction_bytes):
         transaction_text = bytes_to_text(transaction_bytes)

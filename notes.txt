@@ -6,21 +6,20 @@ Client
 ● Can sign transaction with private key
 ● Can broadcast new transactions to network
 
-◯ Can download initial blockchain
-◯ Can download blockchain updates
+● Can download initial blockchain
+● Can download blockchain updates
 ◯ Can verify blockchain
 ◯ Can read blockchain and find transactions for its own addresses (allows it to display balance)
 
 Miner
 -----
-◯ Can generate addresses (with public/private key pair)
-◯ Can create mining reward transactions
+● Can create mining reward transactions
 ● Can receive new transaction broadcasts from clients
 ● Can validate transactions
 ◯ Can receive new block broadcasts from other miners
 ◯ Can broadcast new blocks to network
 ◯ Can download initial blockchain
-◯ Can generate new blockchain
+● Can generate new blockchain
 ● Can mine blocks
 
 Run

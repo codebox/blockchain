@@ -1,4 +1,5 @@
 from socket import *
+import logging
 
 TRANSACTION_PORT = 2606
 BROADCAST_ADDRESS = '255.255.255.255'
@@ -23,4 +24,4 @@ class Network:
             on_transaction(bytes)
 
     def download_new_blocks(self, last_known_block):
-        print('NET: downloading blocks')
+        logging.info('NET: downloading blocks')

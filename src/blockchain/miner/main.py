@@ -1,5 +1,6 @@
 from threading import Thread
 from queue import Queue
+import logging
 
 from blockchain.common.network import Network
 from blockchain.common.encoders import transaction_decode, block_encode
@@ -24,7 +25,7 @@ class MiningServer:
         self.key = key
 
     def _quit(self, signal, frame):
-        print("Stopping")
+        logging.info("Stopping")
         sys.exit(0)
 
     def start(self):
@@ -36,21 +37,18 @@ class MiningServer:
 
         Network().receive_transaction(self.on_transaction)
 
-    def log(self, msg):
-        print(msg)
-
     def mine_block(self, thread_id):
-        self.log('Mining thread {} started'.format(thread_id))
+        logging.info('Mining thread {} started'.format(thread_id))
         miner = Miner(config.get('difficulty'))
         while True:
             unmined_block = self.work_queue.get()
-            self.log('Mining thread {} active'.format(thread_id))
+            logging.info('Mining thread {} active'.format(thread_id))
             miner.mine(unmined_block)
             mined_block = unmined_block
             mined_block.id = hash_string_to_hex(block_encode(mined_block))
             self.blockchain.add_block(mined_block)
             save(self.blockchain)
-            self.log('New block mined! nonce={} hash={}'.format((str(mined_block.nonce)), mined_block.id))
+            logging.info('New block mined! nonce={} hash={}'.format((str(mined_block.nonce)), mined_block.id))
 
     def format_address(self, address):
         return address[:12] + '...'
@@ -59,11 +57,11 @@ class MiningServer:
         transaction_text = bytes_to_text(transaction_bytes)
         transaction = transaction_decode(transaction_text)
 
-        self.log('New Transaction: {} from {} to {}'.format(
+        logging.info('New Transaction: {} from {} to {}'.format(
             transaction.amount, self.format_address(transaction.from_address), self.format_address(transaction.to_address)))
 
         if self.validate_transaction(transaction):
-            self.log('Transaction is valid')
+            logging.info('Transaction is valid')
             self.current_unmined_block.transactions.append(transaction)
             if self.current_unmined_block.is_mineable():
                 self.current_unmined_block.previous_block_id = self.blockchain.get_last_block_id()
@@ -80,9 +78,9 @@ class MiningServer:
 
             else:
                 tc = len(self.current_unmined_block.transactions)
-                self.log('Current block has {} unmined transaction{}'.format(str(tc), '' if tc == 1 else 's'))
+                logging.info('Current block has {} unmined transaction{}'.format(str(tc), '' if tc == 1 else 's'))
         else:
-            self.log('Transaction is invalid')
+            logging.warning('Transaction is invalid')
 
     def validate_transaction(self, transaction):
         signature = transaction.signature
@@ -91,6 +89,8 @@ class MiningServer:
         return Crypto.validate_signature(transaction_details, public_key, signature)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+
     blockchain = load()
 
     crypto = Crypto()

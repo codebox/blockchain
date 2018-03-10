@@ -1,6 +1,7 @@
 from blockchain.common.crypto import Crypto
 from blockchain.common.config import config
 import os
+import logging
 
 class ListAddressesCommand:
     NAME  = 'list-addresses'
@@ -8,7 +9,7 @@ class ListAddressesCommand:
 
     def __init__(self, *args):
         if len(args) != 0:
-            print('wrong number of args for {}'.format(ListAddressesCommand.NAME))
+            logging.error('wrong number of args for {}'.format(ListAddressesCommand.NAME))
 
         else:
             crypto = Crypto()

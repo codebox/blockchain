@@ -28,5 +28,5 @@ class SyncCommand:
     def _get_new_blocks(self, host, last_block_id):
         last_block_id_bytes = text_to_bytes(last_block_id)
         new_blocks_bytes = Network().send_block_request_and_wait(last_block_id_bytes, host)
-        new_blocks_json = bytes_to_text(new_blocks_bytes)
+        new_blocks_json = bytes_to_text(new_blocks_bytes) # handle empty response (unknown block)
         return block_list_decode(new_blocks_json)

@@ -5,6 +5,7 @@ from Crypto.Hash import SHA256
 from blockchain.common.key import Key
 from blockchain.common.hash import hash_to_hex
 from blockchain.common.config import config
+from blockchain.common.utils import text_to_bytes
 
 class Crypto:
     def __init__(self):
@@ -16,6 +17,13 @@ class Crypto:
     def validate_signature(data, public_key, signature):
         public_key = RSA.importKey(public_key)
         return Key(None, public_key, None, None).verify(data, signature)
+
+    @staticmethod
+    def validate_transaction(transaction):
+        signature = transaction.signature
+        public_key = text_to_bytes(transaction.public_key)
+        transaction_details = text_to_bytes(transaction.get_details_for_signature())
+        return Crypto.validate_signature(transaction_details, public_key, signature)
 
     def __get_address_for_key(self, key):
         return hash_to_hex(key.publickey().exportKey(self.key_format.upper()))

@@ -9,7 +9,7 @@ def load(location = None):
     blockchain_store = location or config.get('blockchain_store')
     if os.path.isfile(blockchain_store):
         blockchain = blockchain_decode(open(blockchain_store).read()) #TODO validate blockchain
-        logging.info('Loaded {} blocks from {}'.format(len(blockchain.blocks), blockchain_store))
+        logging.debug('Loaded {} blocks from {}'.format(len(blockchain.blocks), blockchain_store))
         return blockchain
     else:
         blockchain = Blockchain()

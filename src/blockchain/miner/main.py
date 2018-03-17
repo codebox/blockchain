@@ -1,114 +1,76 @@
-from threading import Thread
+from threading import Thread, Event
 from queue import Queue
 import logging
-
-from blockchain.common.network import Network
-from blockchain.common.encoders import transaction_decode, block_encode, block_list_encode
-from blockchain.common.utils import bytes_to_text, text_to_bytes
-from blockchain.common.crypto import Crypto
-from blockchain.common.block import Block
-from blockchain.miner.miner import Miner
-from blockchain.common.hash import hash_string_to_hex
-from blockchain.common.config import config
-from blockchain.common.transaction import Transaction
-from blockchain.common.blockchain_loader import load, save
-
 import signal, sys
 
+from blockchain.common.config import config
+from blockchain.miner.services.block_server import BlockServer
+from blockchain.miner.services.status_broadcaster import StatusBroadcaster
+from blockchain.common.services.status_listener import StatusListener
+from blockchain.common.crypto import Crypto
+from blockchain.miner.services.transaction_listener import TransactionListener
+from blockchain.miner.services.block_miner import BlockMiner
+from blockchain.common.blockchain_loader import load, save
+
+KEY_NAME = 'mining_rewards'
+
 class MiningServer:
-    def __init__(self, blockchain, key, mining_thread_count):
-        self.current_unmined_block = Block()
-        self.blockchain = blockchain
-        self.mining_thread_count = mining_thread_count
-        self.mining_threads = []
+    def __init__(self):
+        self.shutdown_event = Event()
+
+        block_server_port = config.get('block_server_port')
+        self.block_server = BlockServer(block_server_port, self.shutdown_event)
+
+        status_broadcast_port = config.get('status_broadcast_port')
+        status_broadcast_interval_seconds = config.get('status_broadcast_interval_seconds')
+        self.status_broadcaster = StatusBroadcaster(status_broadcast_port, status_broadcast_interval_seconds, self.shutdown_event)
+
+        status_listener_port = config.get('status_broadcast_port')
+        self.status_listener = StatusListener(status_listener_port, self.shutdown_event)
+
+        crypto = Crypto()
+        key = crypto.get_key(KEY_NAME) or crypto.generate_key(KEY_NAME)
         self.work_queue = Queue()
-        self.key = key
+        difficulty = config.get('difficulty')
+        block_size = config.get('block_size')
+        block_reward = config.get('block_reward')
+        block_reward_from_address = config.get('block_reward_from_address')
+        self.block_miner = BlockMiner(key, self.work_queue, difficulty, block_size, block_reward, block_reward_from_address,
+                                      self.shutdown_event, self._on_new_block)
+
+        transaction_listener_port = config.get('transaction_port')
+        self.transaction_listener = TransactionListener(transaction_listener_port, self.shutdown_event, self._on_new_transaction)
 
     def _quit(self, signal, frame):
-        logging.info("Stopping")
-        sys.exit(0)
+        logging.info("Stopping...")
+        self.shutdown_event.set()
+        self.block_server.close()
+        self.status_listener.close()
+        self.transaction_listener.close()
+        self.block_miner.stop()
 
     def start(self):
         signal.signal(signal.SIGINT, self._quit)
-        for id in range(self.mining_thread_count):
-            t = Thread(target=self.mine_block, args=(id,), daemon=True)
-            self.mining_threads.append(t)
-            t.start()
 
-        #TODO sort out this mess
-        Thread(target=self.listen_for_new_block_requests, daemon=True).start()
-        Network().receive_transactions(self.on_transaction)
+        # Miners do several jobs...
+        self.status_broadcaster.start()   # tell everyone else the length of the blockchain that we have
+        self.block_server.start()         # listen for requests for the latest blockchain (from clients or other miners)
+        self.status_listener.start()      # listen for other miners telling us the length of their blockchains
+        self.transaction_listener.start() # listen for new transactions from clients
+        self.block_miner.start()          # mine new blocks
 
-    def mine_block(self, thread_id):
-        logging.info('Mining thread {} started'.format(thread_id))
-        miner = Miner(config.get('difficulty'))
-        while True:
-            unmined_block = self.work_queue.get()
-            logging.info('Mining thread {} active'.format(thread_id))
-            miner.mine(unmined_block)
-            mined_block = unmined_block
-            mined_block.id = hash_string_to_hex(block_encode(mined_block))
-            self.blockchain.add_block(mined_block)
-            save(self.blockchain)
-            logging.info('New block mined! nonce={} hash={}'.format((str(mined_block.nonce)), mined_block.id))
+        self.shutdown_event.wait()
+        logging.info("Main thread stopped")
 
-    def format_address(self, address):
-        return address[:12] + '...'
+    def _on_new_block(self, block):
+        blockchain = load()
+        blockchain.add_block(block)
+        save(blockchain)
 
-    def listen_for_new_block_requests(self):
-        Network().receive_block_requests(self.on_block_request)
-
-    def on_block_request(self, connection, request_bytes):
-        block_id = bytes_to_text(request_bytes)
-        new_blocks = self.blockchain.get_blocks_following(block_id)
-        new_blocks_json = block_list_encode(new_blocks)
-        new_blocks_bytes = text_to_bytes(new_blocks_json)
-        connection.send(new_blocks_bytes)
-        connection.close()
-        logging.info('Sent {} new blocks'.format(len(new_blocks)))
-
-    def on_transaction(self, transaction_bytes):
-        transaction_text = bytes_to_text(transaction_bytes)
-        transaction = transaction_decode(transaction_text)
-
-        logging.info('New Transaction: {} from {} to {}'.format(
-            transaction.amount, self.format_address(transaction.from_address), self.format_address(transaction.to_address)))
-
-        if self.validate_transaction(transaction):
-            logging.info('Transaction is valid')
-            self.current_unmined_block.transactions.append(transaction)
-            if self.current_unmined_block.is_mineable():
-                self.current_unmined_block.previous_block_id = self.blockchain.get_last_block_id()
-
-                # Build the mining reward transaction
-                transaction = Transaction(config.get('block_reward_from'),
-                                          config.get('block_reward'), self.key.address, self.key.get_public_key())
-                transaction_data_to_sign = transaction.get_details_for_signature()
-                transaction.signature = self.key.sign(transaction_data_to_sign)
-
-                self.current_unmined_block.transactions.append(transaction)
-                self.work_queue.put(self.current_unmined_block)
-                self.current_unmined_block = Block()
-
-            else:
-                tc = len(self.current_unmined_block.transactions)
-                logging.info('Current block has {} unmined transaction{}'.format(str(tc), '' if tc == 1 else 's'))
-        else:
-            logging.warning('Transaction is invalid')
-
-    def validate_transaction(self, transaction):
-        signature = transaction.signature
-        public_key = text_to_bytes(transaction.public_key)
-        transaction_details = text_to_bytes(transaction.get_details_for_signature())
-        return Crypto.validate_signature(transaction_details, public_key, signature)
+    def _on_new_transaction(self, transaction):
+        self.work_queue.put(transaction)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
-    blockchain = load()
-
-    crypto = Crypto()
-    KEY_NAME = 'mining_rewards'
-    key = crypto.get_key(KEY_NAME) or crypto.generate_key(KEY_NAME)
-
-    MiningServer(blockchain, key, 3).start()
+    MiningServer().start()

@@ -1,10 +1,10 @@
 from socket import *
 import logging
 
-TRANSACTION_PORT = 2606
+TRANSACTION_PORT = 2608
 BLOCK_PORT = 2607
 BROADCAST_ADDRESS = '255.255.255.255'
-BUFFER_SIZE = 100 * 1024
+BUFFER_SIZE = 1024 * 1024
 
 class Network:
     def __init__(self):
@@ -35,7 +35,7 @@ class Network:
         block_data = s.recv(BUFFER_SIZE)
         s.close()
 
-        logging.info('received new block data from {}'.format(host))
+        logging.info('received new block data from {}: {}'.format(host, block_data))
 
         return block_data
 

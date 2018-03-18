@@ -6,8 +6,8 @@ from blockchain.common.utils import text_to_bytes
 from blockchain.common.encoders import block_encode
 from blockchain.common.block import Block
 from blockchain.common.transaction import Transaction
-from blockchain.common.blockchain_loader import load
 from blockchain.common.crypto import Crypto
+from blockchain.common.blockchain_loader import BlockchainLoader
 
 SERVICE_NAME = 'Miner'
 STOP_WORKING = None
@@ -29,6 +29,18 @@ class BlockMiner(Thread):
         logging.info('{} started'.format(SERVICE_NAME))
 
         while not self.shutdown_event.is_set():
+            self.current_unmined_block.previous_block_id = self._get_last_block_id_from_blockchain()
+            if self.current_unmined_block.is_mineable():
+                mining_reward_transaction = self._build_mining_reward_transaction()
+                self.current_unmined_block.add(mining_reward_transaction)
+
+                logging.info('{} started mining new block'.format(SERVICE_NAME))
+                mined_block = self._mine(self.current_unmined_block)
+                mined_block.id = hash_string_to_hex(block_encode(mined_block))
+                logging.info('{} mined new block! nonce={} id={}'.format(SERVICE_NAME, str(mined_block.nonce), mined_block.id))
+                self.current_unmined_block = Block()
+                self.on_new_block(mined_block)
+
             logging.info('{} waiting for work...'.format(SERVICE_NAME))
             work_item = self.work_queue.get()
 
@@ -41,20 +53,6 @@ class BlockMiner(Thread):
                 continue
 
             self.current_unmined_block.add(transaction)
-            if self.current_unmined_block.is_mineable():
-                #TODO check latest blockchain to see if any of these transactions have been added to another block
-                #TODO check transactions are valid with respect to address balances
-                self.current_unmined_block.previous_block_id = self._get_last_block_id_from_blockchain()
-
-                mining_reward_transaction = self._build_mining_reward_transaction()
-                self.current_unmined_block.add(mining_reward_transaction)
-
-                logging.info('{} started mining new block'.format(SERVICE_NAME))
-                mined_block = self._mine(self.current_unmined_block)
-                mined_block.id = hash_string_to_hex(block_encode(mined_block))
-                logging.info('{} mined new block! nonce={} id={}'.format(SERVICE_NAME, str(mined_block.nonce), mined_block.id))
-                self.current_unmined_block = Block()
-                self.on_new_block(mined_block)
 
         logging.info('{} shut down'.format(SERVICE_NAME))
 
@@ -69,8 +67,7 @@ class BlockMiner(Thread):
         return transaction
 
     def _get_last_block_id_from_blockchain(self):
-        blockchain = load()
-        return blockchain.get_last_block_id()
+        return BlockchainLoader().process(lambda blockchain : blockchain.get_last_block_id())
 
     def _mine(self, block):
         nonce = 0

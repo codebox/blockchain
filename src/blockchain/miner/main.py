@@ -10,7 +10,7 @@ from blockchain.common.services.status_listener import StatusListener
 from blockchain.common.crypto import Crypto
 from blockchain.miner.services.transaction_listener import TransactionListener
 from blockchain.miner.services.block_miner import BlockMiner
-from blockchain.common.blockchain_loader import load, save
+from blockchain.common.blockchain_loader import BlockchainLoader
 
 KEY_NAME = 'mining_rewards'
 
@@ -34,7 +34,7 @@ class MiningServer:
         difficulty = config.get('difficulty')
         block_size = config.get('block_size')
         block_reward = config.get('block_reward')
-        block_reward_from_address = config.get('block_reward_from_address')
+        block_reward_from_address = config.get('block_reward_from')
         self.block_miner = BlockMiner(key, self.work_queue, difficulty, block_size, block_reward, block_reward_from_address,
                                       self.shutdown_event, self._on_new_block)
 
@@ -63,9 +63,7 @@ class MiningServer:
         logging.info("Main thread stopped")
 
     def _on_new_block(self, block):
-        blockchain = load()
-        blockchain.add_block(block)
-        save(blockchain)
+        BlockchainLoader().process(lambda blockchain : blockchain.add_block(block))
 
     def _on_new_transaction(self, transaction):
         self.work_queue.put(transaction)

@@ -10,7 +10,7 @@ def blockchain_decode(blockchain_json):
     blockchain = Blockchain()
     for block_dict in blockchain_dict['blocks']:
         block = block_from_dict(block_dict)
-        blockchain.blocks.append(block)
+        blockchain.add_block(block)
 
     return blockchain
 

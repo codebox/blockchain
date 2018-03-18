@@ -9,6 +9,8 @@ class Block:
         self.id = None
 
     def is_mineable(self):
+        if self.previous_block_id == config.get('genesis_block_id'):
+            return True
         return len(self.transactions) == config.get('block_size')
 
     def add(self, transaction):

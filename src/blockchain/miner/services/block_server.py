@@ -4,7 +4,7 @@ import sys
 import logging
 from blockchain.common.encoders import block_encode, block_list_encode
 from blockchain.common.utils import bytes_to_text, text_to_bytes
-from blockchain.common.blockchain_loader import load
+from blockchain.common.blockchain_loader import BlockchainLoader
 
 SERVICE_NAME = 'Block Server'
 BUFFER_SIZE = 1024 * 1024
@@ -50,8 +50,7 @@ class BlockServer(Thread):
         block_id = bytes_to_text(request_bytes)
         logging.info('{} request for blocks following {}'.format(SERVICE_NAME, block_id))
 
-        blockchain = load()
-        new_blocks = blockchain.get_blocks_following(block_id)
+        new_blocks = BlockchainLoader().process(lambda blockchain : blockchain.get_blocks_following(block_id))
 
         if new_blocks is not None:
             new_blocks_json = block_list_encode(new_blocks)

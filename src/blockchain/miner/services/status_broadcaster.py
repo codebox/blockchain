@@ -1,8 +1,8 @@
 from threading import Thread
 from socket import *
-from blockchain.common.blockchain_loader import load
 from blockchain.common.utils import int_to_bytes
 import logging
+from blockchain.common.blockchain_loader import BlockchainLoader
 
 SERVICE_NAME = 'Status Broadcaster'
 BROADCAST_ADDRESS = '255.255.255.255'
@@ -31,5 +31,4 @@ class StatusBroadcaster(Thread):
         logging.info('{} sent {}.'.format(SERVICE_NAME, blockchain_length))
 
     def _get_blockchain_status_value(self):
-        blockchain = load()
-        return len(blockchain.blocks)
+        return BlockchainLoader().process(lambda blockchain : len(blockchain.blocks))

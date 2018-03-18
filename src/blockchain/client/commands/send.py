@@ -1,9 +1,9 @@
 from blockchain.common.transaction import Transaction
 from blockchain.common.network import Network
-from blockchain.common.blockchain import Blockchain
 from blockchain.common.crypto import Crypto
 from blockchain.common.encoders import transaction_encode
 from blockchain.common.utils import text_to_bytes
+from blockchain.common.blockchain_loader import BlockchainLoader
 
 import re
 import logging
@@ -34,15 +34,13 @@ class SendCommand:
                 logging.error('invalid amount')
 
             else:
-                blockchain = Blockchain()
-                balance = blockchain.get_balance_for_address(key.address)
+                balance = BlockchainLoader().process(lambda b : b.get_balance_for_address(key.address))
                 amount = float(amount_txt)
 
                 if balance < amount:
                     logging.error('insufficient funds')
 
                 else:
-                    to_address = None
                     to_address_key = crypto.get_key(to_address_or_key)
                     if to_address_key:
                         to_address = to_address_key.address

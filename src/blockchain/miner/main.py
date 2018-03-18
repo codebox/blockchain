@@ -26,7 +26,7 @@ class MiningServer:
         self.status_broadcaster = StatusBroadcaster(status_broadcast_port, status_broadcast_interval_seconds, self.shutdown_event)
 
         status_listener_port = config.get('status_broadcast_port')
-        self.status_listener = StatusListener(status_listener_port, self.shutdown_event)
+        self.status_listener = StatusListener(status_listener_port, self.shutdown_event, self._on_new_status)
 
         crypto = Crypto()
         key = crypto.get_key(KEY_NAME) or crypto.generate_key(KEY_NAME)
@@ -67,6 +67,9 @@ class MiningServer:
 
     def _on_new_transaction(self, transaction):
         self.work_queue.put(transaction)
+
+    def _on_new_status(self, blockchain_length, host):
+        pass #TODO
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')

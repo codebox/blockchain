@@ -9,10 +9,11 @@ BUFFER_SIZE = 1024
 BACKLOG_SIZE = 3
 
 class StatusListener(Thread):
-    def __init__(self, listener_port, shutdown_event):
+    def __init__(self, listener_port, shutdown_event, on_update):
         Thread.__init__(self)
         self.listener_port = listener_port
         self.shutdown_event = shutdown_event
+        self.on_update = on_update
 
     def run(self):
         self.socket = socket(AF_INET, SOCK_DGRAM)
@@ -24,8 +25,9 @@ class StatusListener(Thread):
             try:
                 bytes, addr = self.socket.recvfrom(BUFFER_SIZE)
                 status_value = bytes_to_int(bytes)
-                logging.info('{} received new status update of {} from {}'.format(SERVICE_NAME, status_value, addr[0]))
-                self._on_update(status_value)
+                host = addr[0]
+                logging.info('{} received new status update of {} from {}'.format(SERVICE_NAME, status_value, host))
+                self.on_update(status_value, host)
 
             except OSError:
                 logging.debug('{} error: {}'.format(SERVICE_NAME, sys.exc_info()))
@@ -35,9 +37,6 @@ class StatusListener(Thread):
                 logging.error('{} error: {}'.format(SERVICE_NAME, sys.exc_info()))
 
         logging.info('{} shut down'.format(SERVICE_NAME))
-
-    def _on_update(self, value):
-        pass
 
     def close(self):
         self.socket.close()

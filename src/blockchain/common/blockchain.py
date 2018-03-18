@@ -21,6 +21,7 @@ class Blockchain:
                              .format(new_block.previous_block_id, self.get_last_block_id()))
 
         #TODO give transactions timestamp values, check for duplicates
+        #TODO need more checks here
         address_balances = dict(self.address_balances)
         transaction_index = 0
         for transaction in new_block.transactions:

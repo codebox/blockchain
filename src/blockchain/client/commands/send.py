@@ -3,6 +3,7 @@ from blockchain.common.crypto import Crypto
 from blockchain.common.encoders import transaction_encode
 from blockchain.common.utils import text_to_bytes
 from blockchain.common.blockchain_loader import BlockchainLoader
+from blockchain.client.network import Network
 
 import re
 import logging
@@ -37,7 +38,7 @@ class SendCommand:
                 amount = float(amount_txt)
 
                 if balance < amount:
-                    logging.error('insufficient funds')
+                    logging.error('insufficient funds') #TODO improve msg
 
                 else:
                     to_address_key = crypto.get_key(to_address_or_key)
@@ -53,8 +54,7 @@ class SendCommand:
                     encoded_transaction_text = transaction_encode(transaction)
                     encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
 
-                    net = Network()
-                    net.send_transaction(encoded_transaction_bytes)
+                    Network().send_transaction(encoded_transaction_bytes)
 
     def _is_valid_address_format(self, address_candidate):
         return ADDRESS_PATTERN.match(address_candidate)

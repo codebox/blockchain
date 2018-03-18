@@ -20,5 +20,6 @@ class ListAddressesCommand:
         keys = crypto.get_keys()
         print("Found {} address{} in directory '{}':".format(len(keys), '' if len(keys) == 1 else 'es', os.path.abspath(crypto.key_store_dir)))
         for key in keys:
+            #TODO improve formatting
             print('* {} {} - {}'.format(key.name, blockchain.get_balance_for_address(key.address), key.address))
 

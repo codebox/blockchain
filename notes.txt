@@ -25,9 +25,7 @@ Miner
 TODO
 ----
 * better validation when adding new blocks
-* client address balances
 * adjust block_size according to chain length
-* on sync, client should listen until stopped by user - first update received may not be for longest chain
 
 Run
 ---

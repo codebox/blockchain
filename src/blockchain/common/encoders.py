@@ -19,7 +19,7 @@ def blockchain_to_dict(blockchain):
 
 def blockchain_encode(blockchain):
     blockchain_dict = blockchain_to_dict(blockchain)
-    return json.dumps(blockchain_dict)
+    return json.dumps(blockchain_dict, sort_keys=True)
 
 def block_from_dict(block_dict):
     block = Block()
@@ -42,7 +42,7 @@ def block_decode(block_json):
     return block_from_dict(block_dict)
 
 def block_encode(block):
-    return json.dumps(block_to_dict(block))
+    return json.dumps(block_to_dict(block), sort_keys=True)
 
 def block_list_decode(block_list_json):
     block_list = json.loads(block_list_json)
@@ -72,10 +72,4 @@ def transaction_decode(transaction_json):
     return transaction_from_dict(transaction_dict)
 
 def transaction_encode(transaction):
-    return json.dumps(transaction_to_dict(transaction))
-
-def block_ids_decode(block_json):
-    return json.loads(block_json)
-
-def block_ids_encode(block_list):
-    return json.dumps(block_list)
+    return json.dumps(transaction_to_dict(transaction), sort_keys=True)

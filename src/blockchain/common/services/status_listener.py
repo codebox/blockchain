@@ -1,6 +1,6 @@
 from socket import *
 from threading import Thread
-from blockchain.common.utils import bytes_to_int
+from blockchain.common.utils import bytes_to_text
 import logging
 import sys
 
@@ -24,10 +24,10 @@ class StatusListener(Thread):
         while not self.shutdown_event.is_set():
             try:
                 bytes, addr = self.socket.recvfrom(BUFFER_SIZE)
-                status_value = bytes_to_int(bytes)
+                status_value, block_server_port = bytes_to_text(bytes).split(':')
                 host = addr[0]
-                logging.info('{} received new status update of {} from {}'.format(SERVICE_NAME, status_value, host))
-                self.on_update(status_value, host)
+                logging.info('{} received new status update of {} from {}:{}'.format(SERVICE_NAME, status_value, host, block_server_port))
+                self.on_update(int(status_value), host, int(block_server_port))
 
             except OSError:
                 logging.debug('{} error: {}'.format(SERVICE_NAME, sys.exc_info()))

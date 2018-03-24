@@ -15,23 +15,23 @@ class Network:
         s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         s.sendto(bytes, (BROADCAST_ADDRESS, config.get('transaction_port')))
 
-    def send_block_request_and_wait(self, bytes, host):
+    def send_block_request_and_wait(self, bytes, host, port):
         logging.info('requesting new blocks from {}'.format(host))
 
         s = socket(AF_INET, SOCK_STREAM)
-        s.connect((host, config.get('block_server_port')))
+        s.connect((host, port))
         s.send(bytes)
         block_data = s.recv(BUFFER_SIZE)
         s.close()
 
-        logging.info('received new block data from {}: {}'.format(host, block_data))
+        logging.info('received new block data from {}:{} {}'.format(host, port, block_data))
 
         return block_data
 
     def find_host_to_sync(self, on_host_found, shutdown_event):
-        def callback(value, host):
+        def callback(value, host, port):
             shutdown_event.set()
-            on_host_found(host)
+            on_host_found(host, port)
 
         status_listener_port = config.get('status_broadcast_port')
         listener = StatusListener(status_listener_port, shutdown_event, callback)

@@ -2,7 +2,6 @@ from socket import *
 import logging
 from blockchain.common.config import config
 from blockchain.common.services.status_listener import StatusListener
-from threading import Event
 
 BROADCAST_ADDRESS = '255.255.255.255'
 BUFFER_SIZE = 1024 * 1024
@@ -29,13 +28,13 @@ class Network:
 
         return block_data
 
-    def find_host_to_sync(self, on_host_found):
-        shutdown_event = Event()
-
+    def find_host_to_sync(self, on_host_found, shutdown_event):
         def callback(value, host):
             shutdown_event.set()
             on_host_found(host)
 
         status_listener_port = config.get('status_broadcast_port')
-        StatusListener(status_listener_port, shutdown_event, callback).start()
+        listener = StatusListener(status_listener_port, shutdown_event, callback)
+        listener.start()
+        return listener
 

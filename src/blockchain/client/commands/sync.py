@@ -2,8 +2,9 @@ from blockchain.client.network import Network
 from blockchain.common.blockchain_loader import BlockchainLoader
 from blockchain.common.utils import text_to_bytes, bytes_to_text
 from blockchain.common.encoders import block_list_decode
-
+import signal
 import logging
+from threading import Event
 
 class SyncCommand:
     NAME  = 'sync'
@@ -14,7 +15,13 @@ class SyncCommand:
             logging.error('wrong number of args for {}'.format(SyncCommand.NAME))
 
         else:
-            Network().find_host_to_sync(self.on_sync_host_found)
+            self.shutdown_event = Event()
+            self.listener = Network().find_host_to_sync(self.on_sync_host_found, self.shutdown_event)
+            signal.signal(signal.SIGINT, self._quit)
+
+    def _quit(self, signal, frame):
+        self.shutdown_event.set()
+        self.listener.close()
 
     def on_sync_host_found(self, host):
         def update_blockchain(blockchain):

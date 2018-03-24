@@ -29,12 +29,8 @@ class Network:
         return block_data
 
     def find_host_to_sync(self, on_host_found, shutdown_event):
-        def callback(value, host, port):
-            shutdown_event.set()
-            on_host_found(host, port)
-
         status_listener_port = config.get('status_broadcast_port')
-        listener = StatusListener(status_listener_port, shutdown_event, callback)
+        listener = StatusListener(status_listener_port, shutdown_event, on_host_found)
         listener.start()
         return listener
 

@@ -23,13 +23,19 @@ class SyncCommand:
         self.shutdown_event.set()
         self.listener.close()
 
-    def on_sync_host_found(self, host, port):
+    def on_sync_host_found(self, blockchain_length, host, port):
         def update_blockchain(blockchain):
-            last_block_id = blockchain.get_last_block_id()
-            new_blocks = self._get_new_blocks(host, port, last_block_id)
-            logging.info('Received {} new blocks from {}:{}'.format(len(new_blocks), host, port))
-            for new_block in new_blocks:
-                blockchain.add_block(new_block)
+            if blockchain_length > len(blockchain.blocks):
+                last_block_id = blockchain.get_last_block_id()
+                new_blocks = self._get_new_blocks(host, port, last_block_id)
+                for new_block in new_blocks:
+                    blockchain.add_block(new_block)
+                logging.info('Received {} new blocks from {}:{}'.format(len(new_blocks), host, port))
+
+            else:
+                logging.debug('Host {}:{} has {} blocks, ignoring because we already have {}'.format(
+                    host, port,blockchain_length, len(blockchain.blocks)
+                ))
 
         BlockchainLoader().process(update_blockchain)
 

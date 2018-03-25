@@ -17,7 +17,7 @@ Miner
 ● Can create mining reward transactions
 ● Can receive new transaction broadcasts from clients
 ● Can validate transactions
-◯ Can receive new block broadcasts from other miners
+● Can receive new block broadcasts from other miners
 ● Can broadcast new blocks to network
 ● Can generate new blockchain
 ● Can mine blocks

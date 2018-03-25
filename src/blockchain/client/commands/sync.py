@@ -1,7 +1,5 @@
 from blockchain.client.network import Network
-from blockchain.common.blockchain_loader import BlockchainLoader
-from blockchain.common.utils import text_to_bytes, bytes_to_text
-from blockchain.common.encoders import block_list_decode
+from blockchain.common.services.blockchain_updater import BlockchainUpdater
 import signal
 import logging
 from threading import Event
@@ -16,31 +14,12 @@ class SyncCommand:
 
         else:
             self.shutdown_event = Event()
-            self.listener = Network().find_host_to_sync(self.on_sync_host_found, self.shutdown_event)
+
+            on_status_update = BlockchainUpdater().handle_status_update
+            self.listener = Network().find_host_to_sync(on_status_update, self.shutdown_event)
+
             signal.signal(signal.SIGINT, self._quit)
 
     def _quit(self, signal, frame):
         self.shutdown_event.set()
         self.listener.close()
-
-    def on_sync_host_found(self, blockchain_length, host, port):
-        def update_blockchain(blockchain):
-            if blockchain_length > len(blockchain.blocks):
-                last_block_id = blockchain.get_last_block_id()
-                new_blocks = self._get_new_blocks(host, port, last_block_id)
-                for new_block in new_blocks:
-                    blockchain.add_block(new_block)
-                logging.info('Received {} new blocks from {}:{}'.format(len(new_blocks), host, port))
-
-            else:
-                logging.debug('Host {}:{} has {} blocks, ignoring because we already have {}'.format(
-                    host, port,blockchain_length, len(blockchain.blocks)
-                ))
-
-        BlockchainLoader().process(update_blockchain)
-
-    def _get_new_blocks(self, host, port, last_block_id):
-        last_block_id_bytes = text_to_bytes(last_block_id)
-        new_blocks_bytes = Network().send_block_request_and_wait(last_block_id_bytes, host, port)
-        new_blocks_json = bytes_to_text(new_blocks_bytes) # TODO handle empty response (unknown block)
-        return block_list_decode(new_blocks_json)

@@ -7,6 +7,7 @@ from blockchain.common.config import config
 from blockchain.miner.services.block_server import BlockServer
 from blockchain.miner.services.status_broadcaster import StatusBroadcaster
 from blockchain.common.services.status_listener import StatusListener
+from blockchain.common.services.blockchain_updater import BlockchainUpdater
 from blockchain.common.crypto import Crypto
 from blockchain.miner.services.transaction_listener import TransactionListener
 from blockchain.miner.services.block_miner import BlockMiner
@@ -26,6 +27,8 @@ class MiningServer:
         status_broadcast_interval_seconds = config.get('status_broadcast_interval_seconds')
         self.status_broadcaster = StatusBroadcaster(status_broadcast_port, block_server_port,
                                                     status_broadcast_interval_seconds, self.shutdown_event)
+
+        self.blockchain_updater = BlockchainUpdater()
 
         status_listener_port = config.get('status_broadcast_port')
         self.status_listener = StatusListener(status_listener_port, self.shutdown_event, self._on_new_status)
@@ -71,7 +74,7 @@ class MiningServer:
         self.work_queue.put(transaction)
 
     def _on_new_status(self, blockchain_length, host, port):
-        pass #TODO
+        self.blockchain_updater.handle_status_update(blockchain_length, host, port)
 
 if __name__ == '__main__':
     args = update_config_from_args(sys.argv)

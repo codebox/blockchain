@@ -1,4 +1,4 @@
-from threading import Thread, Event
+from threading import Event
 from queue import Queue
 import logging
 import signal, sys

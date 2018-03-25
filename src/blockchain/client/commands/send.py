@@ -4,6 +4,7 @@ from blockchain.common.encoders import transaction_encode
 from blockchain.common.utils import text_to_bytes
 from blockchain.common.blockchain_loader import BlockchainLoader
 from blockchain.client.network import Network
+from blockchain.client.payment_manager import PaymentManager
 
 import re
 import logging
@@ -50,6 +51,8 @@ class SendCommand:
                     transaction = Transaction(key.address, amount, to_address, key.get_public_key())
                     transaction_data_to_sign = transaction.get_details_for_signature()
                     transaction.signature = key.sign(transaction_data_to_sign)
+
+                    PaymentManager().log_unconfirmed_payment(transaction)
 
                     encoded_transaction_text = transaction_encode(transaction)
                     encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)

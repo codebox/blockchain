@@ -1,7 +1,6 @@
 import os.path
 from glob import glob
 from Crypto.PublicKey import RSA
-from Crypto.Hash import SHA256
 from blockchain.common.key import Key
 from blockchain.common.hash import hash_to_hex
 from blockchain.common.config import config

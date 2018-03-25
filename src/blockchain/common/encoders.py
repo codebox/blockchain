@@ -55,7 +55,10 @@ def transaction_from_dict(transaction_dict):
     transaction = Transaction(transaction_dict['from_address'], transaction_dict['amount'],
         transaction_dict['to_address'], transaction_dict['public_key'])
 
+    transaction.timestamp = transaction_dict['timestamp']
     transaction.signature = transaction_dict['signature']
+    transaction.id        = transaction_dict['id']
+
     return transaction
 
 def transaction_to_dict(transaction):
@@ -63,8 +66,10 @@ def transaction_to_dict(transaction):
         'from_address' : transaction.from_address,
         'amount'       : transaction.amount,
         'to_address'   : transaction.to_address,
+        'timestamp'    : transaction.timestamp,
         'public_key'   : transaction.public_key,
-        'signature'    : transaction.signature
+        'signature'    : transaction.signature,
+        'id'           : transaction.id
     }
 
 def transaction_decode(transaction_json):
@@ -73,3 +78,10 @@ def transaction_decode(transaction_json):
 
 def transaction_encode(transaction):
     return json.dumps(transaction_to_dict(transaction), sort_keys=True)
+
+def transaction_list_decode(transaction_list_json):
+    transaction_list = json.loads(transaction_list_json)
+    return list(map(transaction_from_dict, transaction_list))
+
+def transaction_list_encode(transaction_list):
+    return json.dumps(list(map(transaction_to_dict, transaction_list)))

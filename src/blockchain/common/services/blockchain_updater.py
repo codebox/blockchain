@@ -5,6 +5,9 @@ from blockchain.common.encoders import block_list_decode
 import logging
 
 class BlockchainUpdater:
+    def __init__(self, on_valid_block = lambda b: b):
+        self.on_valid_block = on_valid_block
+
     def handle_status_update(self, blockchain_length, host, port):
         def update_blockchain(blockchain):
             if blockchain_length > len(blockchain.blocks):
@@ -12,6 +15,7 @@ class BlockchainUpdater:
                 new_blocks = self._get_new_blocks(host, port, last_block_id)
                 for new_block in new_blocks:
                     blockchain.add_block(new_block)
+                    self.on_valid_block(new_block)
                 logging.info('Received {} new blocks from {}:{}'.format(len(new_blocks), host, port))
 
             else:

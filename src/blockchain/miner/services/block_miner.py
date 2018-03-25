@@ -2,12 +2,11 @@ from threading import Thread
 import logging
 import math
 from blockchain.common.hash import hash_string, hash_string_to_hex
-from blockchain.common.utils import text_to_bytes
 from blockchain.common.encoders import block_encode
 from blockchain.common.block import Block
-from blockchain.common.transaction import Transaction
 from blockchain.common.crypto import Crypto
 from blockchain.common.blockchain_loader import BlockchainLoader
+from blockchain.common.services.transaction_helper import build_transaction
 
 SERVICE_NAME = 'Miner'
 STOP_WORKING = None
@@ -60,11 +59,8 @@ class BlockMiner(Thread):
         self.work_queue.put(STOP_WORKING)
 
     def _build_mining_reward_transaction(self):
-        transaction = Transaction(self.block_reward_from_address, self.block_reward,
-                                  self.key.address, self.key.get_public_key())
-        transaction_data_to_sign = transaction.get_details_for_signature()
-        transaction.signature = self.key.sign(transaction_data_to_sign)
-        return transaction
+        return build_transaction(self.block_reward_from_address, self.block_reward,
+                                 self.key.address, self.key)
 
     def _get_last_block_id_from_blockchain(self):
         return BlockchainLoader().process(lambda blockchain : blockchain.get_last_block_id())

@@ -25,9 +25,10 @@ Miner
 TODO
 ----
 * better validation when adding new blocks
-* adjust block_size according to chain length
+* adjust block_size according to chain length?
 * miner should abort current mining if new block received
 * client sync should re-send unconfirmed payments, miners should check incoming transactions to see if they are already in a block
+* BlockchainUpdater does not handle chain forking correctly
 
 Run
 ---

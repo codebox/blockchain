@@ -10,7 +10,7 @@ Client
 ● Can download blockchain updates
 ● Can verify blockchain
 ● Can read blockchain and find transactions for its own addresses (allows it to display balance)
-◯ Can display payments made/received, including pending ones
+● Can display payments made/received, including pending ones
 
 Miner
 -----
@@ -24,11 +24,11 @@ Miner
 
 TODO
 ----
-* better validation when adding new blocks
-* adjust block_size according to chain length?
-* miner should abort current mining if new block received
 * client sync should re-send unconfirmed payments, miners should check incoming transactions to see if they are already in a block
+* miner should abort current mining if new block received
+* better validation when adding new blocks
 * BlockchainUpdater does not handle chain forking correctly
+* adjust block_size according to chain length?
 
 Run
 ---

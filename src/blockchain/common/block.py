@@ -14,7 +14,10 @@ class Block:
         return len(self.transactions) == config.get('block_size')
 
     def add(self, transaction):
-        self.transactions.append(transaction)
+        self.transactions.append(transaction) # TODO validation, has id and signature
+
+    def has_transaction(self, transaction):
+        return next((True for t in self.transactions if t.id == transaction.id), False)
 
     def set_nonce(self, nonce):
         self.nonce = nonce

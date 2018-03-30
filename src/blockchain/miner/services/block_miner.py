@@ -51,6 +51,14 @@ class BlockMiner(Thread):
                 logging.warning('{} received invalid transaction (invalid signature)'.format(SERVICE_NAME))
                 continue
 
+            if self.current_unmined_block.has_transaction(transaction):
+                logging.info('{} ignoring transaction, already added to current block'.format(SERVICE_NAME))
+                continue
+
+            if self._is_transaction_already_in_blockchain(transaction):
+                logging.info('{} ignoring transaction, already in blockchain'.format(SERVICE_NAME))
+                continue
+
             self.current_unmined_block.add(transaction)
 
         logging.info('{} shut down'.format(SERVICE_NAME))
@@ -64,6 +72,9 @@ class BlockMiner(Thread):
 
     def _get_last_block_id_from_blockchain(self):
         return BlockchainLoader().process(lambda blockchain : blockchain.get_last_block_id())
+
+    def _is_transaction_already_in_blockchain(self, transaction):
+        return BlockchainLoader().process(lambda blockchain : blockchain.has_transaction(transaction))
 
     def _mine(self, block):
         nonce = 0

@@ -74,3 +74,6 @@ class Blockchain:
 
     def get_balance_for_address(self, address):
         return self.address_balances.get(address) or 0
+
+    def has_transaction(self, transaction):
+        return any(map(lambda b : b.has_transaction(transaction), self.blocks))

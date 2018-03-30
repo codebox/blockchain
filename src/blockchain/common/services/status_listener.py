@@ -26,7 +26,7 @@ class StatusListener(Thread):
                 bytes, addr = self.socket.recvfrom(BUFFER_SIZE)
                 status_value, block_server_port = bytes_to_text(bytes).split(':')
                 host = addr[0]
-                logging.info('{} received new status update of {} from {}:{}'.format(SERVICE_NAME, status_value, host, block_server_port))
+                logging.debug('{} received new status update of {} from {}:{}'.format(SERVICE_NAME, status_value, host, block_server_port))
                 self.on_update(int(status_value), host, int(block_server_port))
 
             except OSError:

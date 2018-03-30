@@ -24,7 +24,7 @@ class Network:
         block_data = s.recv(BUFFER_SIZE)
         s.close()
 
-        logging.info('received new block data from {}:{} {}'.format(host, port, block_data))
+        logging.debug('received new block data from {}:{} {}'.format(host, port, block_data))
 
         return block_data
 

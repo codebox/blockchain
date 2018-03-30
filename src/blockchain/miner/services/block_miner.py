@@ -12,7 +12,8 @@ SERVICE_NAME = 'Miner'
 STOP_WORKING = None
 
 class BlockMiner(Thread):
-    def __init__(self, key, work_queue, difficulty, block_size, block_reward, block_reward_from_address, shutdown_event, on_new_block):
+    def __init__(self, key, work_queue, difficulty, block_size, block_reward, block_reward_from_address, shutdown_event,
+                 stop_mining_event, on_new_block):
         Thread.__init__(self)
         self.key = key
         self.work_queue = work_queue
@@ -21,6 +22,7 @@ class BlockMiner(Thread):
         self.block_reward = block_reward
         self.block_reward_from_address = block_reward_from_address
         self.shutdown_event = shutdown_event
+        self.stop_mining_event = stop_mining_event
         self.on_new_block = on_new_block
         self.current_unmined_block = Block()
 
@@ -35,10 +37,14 @@ class BlockMiner(Thread):
 
                 logging.info('{} started mining new block'.format(SERVICE_NAME))
                 mined_block = self._mine(self.current_unmined_block)
-                mined_block.id = hash_string_to_hex(block_encode(mined_block))
-                logging.info('{} mined new block! nonce={} id={}'.format(SERVICE_NAME, str(mined_block.nonce), mined_block.id))
+                if mined_block:
+                    mined_block.id = hash_string_to_hex(block_encode(mined_block))
+                    logging.info('{} mined new block! nonce={} id={}'.format(SERVICE_NAME, str(mined_block.nonce), mined_block.id))
+                    self.on_new_block(mined_block)
+                else:
+                    logging.info('{} mining of current block abandoned'.format(SERVICE_NAME))
+
                 self.current_unmined_block = Block()
-                self.on_new_block(mined_block)
 
             logging.info('{} waiting for work...'.format(SERVICE_NAME))
             work_item = self.work_queue.get()
@@ -77,8 +83,10 @@ class BlockMiner(Thread):
         return BlockchainLoader().process(lambda blockchain : blockchain.has_transaction(transaction))
 
     def _mine(self, block):
+        self.stop_mining_event.clear()
+
         nonce = 0
-        while not self.shutdown_event.is_set():
+        while not self.shutdown_event.is_set() and not self.stop_mining_event.is_set():
             block.nonce = nonce
 
             hash_as_bytes = hash_string(block_encode(block))

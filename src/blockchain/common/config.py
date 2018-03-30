@@ -1,5 +1,5 @@
 config = {
-    'difficulty' : 18,
+    'difficulty' : 20,
     'block_size' : 1,
     'block_reward' : 10,
     'block_reward_from' : '0',

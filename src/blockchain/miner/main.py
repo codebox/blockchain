@@ -19,6 +19,7 @@ KEY_NAME = 'mining_rewards'
 class MiningServer:
     def __init__(self):
         self.shutdown_event = Event()
+        self.stop_mining_event = Event()
 
         block_server_port = config.get('block_server_port')
         self.block_server = BlockServer(block_server_port, self.shutdown_event)
@@ -28,7 +29,7 @@ class MiningServer:
         self.status_broadcaster = StatusBroadcaster(status_broadcast_port, block_server_port,
                                                     status_broadcast_interval_seconds, self.shutdown_event)
 
-        self.blockchain_updater = BlockchainUpdater()
+        self.blockchain_updater = BlockchainUpdater(self._on_new_block_downloaded)
 
         status_listener_port = config.get('status_broadcast_port')
         self.status_listener = StatusListener(status_listener_port, self.shutdown_event, self._on_new_status)
@@ -41,7 +42,7 @@ class MiningServer:
         block_reward = config.get('block_reward')
         block_reward_from_address = config.get('block_reward_from')
         self.block_miner = BlockMiner(key, self.work_queue, difficulty, block_size, block_reward, block_reward_from_address,
-                                      self.shutdown_event, self._on_new_block)
+                                      self.shutdown_event, self.stop_mining_event, self._on_new_block_mined)
 
         transaction_listener_port = config.get('transaction_port')
         self.transaction_listener = TransactionListener(transaction_listener_port, self.shutdown_event, self._on_new_transaction)
@@ -67,8 +68,12 @@ class MiningServer:
         self.shutdown_event.wait()
         logging.info("Main thread stopped")
 
-    def _on_new_block(self, block):
+    def _on_new_block_mined(self, block):
         BlockchainLoader().process(lambda blockchain : blockchain.add_block(block))
+
+    def _on_new_block_downloaded(self, block):
+        # we got a new block from elsewhere, stop mining current block someone else beat us to it
+        self.stop_mining_event.set()
 
     def _on_new_transaction(self, transaction):
         self.work_queue.put(transaction)

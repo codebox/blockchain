@@ -9,6 +9,7 @@ config = {
     'blockchain_store' : 'blockchain.json',
     'genesis_block_id' : 'genesis',
     'status_broadcast_interval_seconds' : 5,
+    'transaction_broadcast_interval_seconds' : 5,
     'status_broadcast_port' : 2606,
     'block_server_port' : 2607,
     'transaction_port' : 2608

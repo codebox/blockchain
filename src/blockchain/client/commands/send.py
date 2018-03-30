@@ -53,10 +53,14 @@ class SendCommand:
 
                     UnconfirmedPaymentsLoader().process(lambda u_p : u_p.add(transaction))
 
-                    encoded_transaction_text = transaction_encode(transaction)
-                    encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
+                    SendCommand.send_transaction(transaction)
 
-                    Network().send_transaction(encoded_transaction_bytes)
+    @staticmethod
+    def send_transaction(transaction):
+        encoded_transaction_text = transaction_encode(transaction)
+        encoded_transaction_bytes = text_to_bytes(encoded_transaction_text)
+
+        Network().send_transaction(encoded_transaction_bytes)
 
     def _is_valid_address_format(self, address_candidate):
         return ADDRESS_PATTERN.match(address_candidate)

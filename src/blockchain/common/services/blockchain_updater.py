@@ -1,4 +1,4 @@
-from blockchain.client.network import Network
+from blockchain.wallet.network import Network
 from blockchain.common.blockchain_loader import BlockchainLoader
 from blockchain.common.utils import text_to_bytes, bytes_to_text
 from blockchain.common.encoders import block_list_decode

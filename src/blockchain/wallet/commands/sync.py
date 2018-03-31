@@ -1,8 +1,8 @@
-from blockchain.client.network import Network
+from blockchain.wallet.network import Network
 from blockchain.common.services.blockchain_updater import BlockchainUpdater
 from blockchain.common.blockchain_loader import BlockchainLoader
-from blockchain.client.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
-from blockchain.client.commands.send import SendCommand
+from blockchain.wallet.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
+from blockchain.wallet.commands.send import SendCommand
 from blockchain.common.config import config
 import signal
 import logging

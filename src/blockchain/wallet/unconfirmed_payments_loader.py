@@ -1,5 +1,5 @@
 from blockchain.common.config import config
-from blockchain.client.unconfirmed_payments import UnconfirmedPayments
+from blockchain.wallet.unconfirmed_payments import UnconfirmedPayments
 from blockchain.common.encoders import transaction_list_encode, transaction_list_decode
 import os.path
 import logging

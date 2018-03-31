@@ -3,8 +3,8 @@ from blockchain.common.crypto import Crypto
 from blockchain.common.encoders import transaction_encode
 from blockchain.common.utils import text_to_bytes
 from blockchain.common.blockchain_loader import BlockchainLoader
-from blockchain.client.network import Network
-from blockchain.client.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
+from blockchain.wallet.network import Network
+from blockchain.wallet.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
 from blockchain.common.services.transaction_helper import build_transaction
 
 import re

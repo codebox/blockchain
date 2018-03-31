@@ -1,7 +1,7 @@
 from blockchain.common.crypto import Crypto
 from blockchain.common.config import config
 from blockchain.common.blockchain_loader import BlockchainLoader
-from blockchain.client.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
+from blockchain.wallet.unconfirmed_payments_loader import UnconfirmedPaymentsLoader
 import os
 import logging
 

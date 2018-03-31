@@ -1,10 +1,10 @@
 import sys
 import logging
 
-from blockchain.client.commands.send import SendCommand
-from blockchain.client.commands.make_address import MakeAddressCommand
-from blockchain.client.commands.list_addresses import ListAddressesCommand
-from blockchain.client.commands.sync import SyncCommand
+from blockchain.wallet.commands.send import SendCommand
+from blockchain.wallet.commands.make_address import MakeAddressCommand
+from blockchain.wallet.commands.list_addresses import ListAddressesCommand
+from blockchain.wallet.commands.sync import SyncCommand
 from blockchain.common.config import update_config_from_args
 
 COMMANDS = [SendCommand, MakeAddressCommand, ListAddressesCommand, SyncCommand]

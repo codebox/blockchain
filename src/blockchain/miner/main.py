@@ -60,9 +60,9 @@ class MiningServer:
 
         # Miners do several jobs...
         self.status_broadcaster.start()   # tell everyone else the length of the blockchain that we have
-        self.block_server.start()         # listen for requests for the latest blockchain (from clients or other miners)
+        self.block_server.start()         # listen for requests for the latest blockchain (from wallets or other miners)
         self.status_listener.start()      # listen for other miners telling us the length of their blockchains
-        self.transaction_listener.start() # listen for new transactions from clients
+        self.transaction_listener.start() # listen for new transactions from wallets
         self.block_miner.start()          # mine new blocks
 
         self.shutdown_event.wait()

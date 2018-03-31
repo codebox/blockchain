@@ -1,4 +1,4 @@
-Client
+Wallet
 ------
 ● Can generate addresses (with public/private key pair)
 
@@ -15,7 +15,7 @@ Client
 Miner
 -----
 ● Can create mining reward transactions
-● Can receive new transaction broadcasts from clients
+● Can receive new transaction broadcasts from wallets
 ● Can validate transactions
 ● Can receive new block broadcasts from other miners
 ● Can broadcast new blocks to network
@@ -32,7 +32,7 @@ Run
 ---
 source ENV/bin/activate
 cd src
-python -m blockchain.client.main
+python -m blockchain.wallet.main
 python -m blockchain.miner.main
 
 Links

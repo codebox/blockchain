@@ -1,6 +1,6 @@
 config = {
     'difficulty' : 20,
-    'block_size' : 1,
+    'block_size' : 5,
     'block_reward' : 10,
     'block_reward_from' : '0',
     'key_store_dir' : '.',

@@ -25,6 +25,7 @@ class SyncCommand:
 
             signal.signal(signal.SIGINT, self._quit)
 
+            print('Synchronising with the network, press Ctrl-C to quit')
             self._sync_unconfirmed_payments()
             self._send_unconfirmed_payments()
 

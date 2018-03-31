@@ -6,6 +6,8 @@ from blockchain.common.hash import hash_to_hex
 from blockchain.common.config import config
 from blockchain.common.utils import text_to_bytes
 
+MAX_KEY_NAME_LENGTH = 16
+
 class Crypto:
     def __init__(self):
         self.key_store_dir = config.get('key_store_dir')
@@ -52,6 +54,9 @@ class Crypto:
     def generate_key(self, key_name):
         if self.get_key(key_name):
             raise ValueError('a key called {} already exists'.format(key_name))
+
+        if len(key_name) > MAX_KEY_NAME_LENGTH:
+            raise ValueError('key name is too long, must be {} characters or less'.format(MAX_KEY_NAME_LENGTH))
 
         key = RSA.generate(self.key_size)
         key_file_path = self.__get_key_file_path(key_name)

@@ -26,7 +26,7 @@ TODO
 ----
 * better validation when adding new blocks
 * BlockchainUpdater does not handle chain forking correctly
-* adjust block_size according to chain length?
+* TODOs in code
 
 Run
 ---

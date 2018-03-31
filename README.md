@@ -94,29 +94,29 @@ A block server may also receive requests for more than 1 block, from wallets or 
 ### Configuration
 There are various parameters used by the wallet and miner applications which can be configured to alter the characteristics of the network. These parameters are stored in the `config.py` file, details below:
 
-####difficulty
+#### difficulty
 Controls the difficulty of the proof-of-work calculation performed when mining a block. The numeric value corresponds to the number of 0-bits that must be present at the start of the SHA256 hash of the contents of a valid mined block. The task of mining consists of adding a numeric value (called a _nonce_) into a block, hashing the block, and checking whether the hash has this many 0-bits at the start of it. The nonce value is incremented until a satisfactory hash is obtained, at which point the block is considered to be mined. Increasing the difficulty by 1 will, on average, double the time it takes to mine blocks.  
 
-####block_size
+#### block_size
 The number of transactions which must be present in a block before it can be mined.
 
-####block_reward
+#### block_reward
 The amount of funds that a miner is allowed to allocate to themselves if they successfully mine a new block.
 
-####key_size
+#### key_size
 The number of bits in the cryptographic keys used to sign transactions. [Larger values increase security](https://crypto.stackexchange.com/questions/19655/what-is-the-history-of-recommended-rsa-key-sizes) but require more CPU processing time.
 
-####status_broadcast_interval_seconds
+#### status_broadcast_interval_seconds
 The interval (in seconds) between status broadcasts issued by mining nodes.
 
-####transaction_broadcast_interval_seconds
+#### transaction_broadcast_interval_seconds
 The interval (in seconds) between transaction broadcasts issued by wallets.
 
-####status_broadcast_port
+#### status_broadcast_port
 The UDP port number used by miners for sending status broadcasts. All members of the network must use the same value for this parameter.
 
-####block_server_port
+#### block_server_port
 The TCP port used by a mining node for its block server. Each miner may use a different port number, allowing multiple miners to run on the same host. Miners include the port number of their block server in the status broadcast.
 
-####transaction_port
+#### transaction_port
 The UDP port number used by wallets to announce new transactions to the network. All members of the network must use the same value for this parameter.

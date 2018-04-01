@@ -15,18 +15,48 @@ class Blockchain:
     def get_last_block_id(self):
         return self.blocks[-1].id
 
+    def remove_last_block(self):
+        last_block = self.blocks.pop()
+        for transaction in last_block.transactions:
+            from_address = transaction.from_address
+            to_address   = transaction.to_address
+            amount       = transaction.amount
+
+            self.address_balances[from_address] += amount
+            self.address_balances[to_address]   -= amount
+
     def add_block(self, new_block):
-        if len(self.blocks) and self.get_last_block_id() != new_block.previous_block_id:
+        if len(self.blocks) == 0:
+            if new_block.id == config.get('genesis_block_id'):
+                self.blocks.append(new_block)
+                return
+            else:
+                raise ValueError('First block to be added must be the genesis block with id {}'.format(config.get('genesis_block_id')))
+
+        if self.get_last_block_id() != new_block.previous_block_id:
             raise ValueError('Refused to add new block, previous_block_id {} does not match actual previous block {}'
                              .format(new_block.previous_block_id, self.get_last_block_id()))
 
-        #TODO give transactions timestamp values, check for duplicates
-        #TODO need more checks here
+        if not new_block.is_mineable():
+            raise ValueError('Refused to add new block, block is not mineable')
+
+        #TODO check block difficulty
+
         address_balances = dict(self.address_balances)
         transaction_index = 0
+        transaction_ids_for_new_block = set()
+
         for transaction in new_block.transactions:
             if not Crypto.validate_transaction(transaction):
                 raise ValueError('Invalid transaction in new block (bad signature): {}'.format(transaction))
+
+            if self.has_transaction(transaction):
+                raise ValueError('Transaction with id {} already exists within the blockchain'.format(transaction.id))
+
+            if transaction.id in transaction_ids_for_new_block:
+                raise ValueError('Duplicate transaction in new block, id: {}'.format(transaction.id))
+
+            transaction_ids_for_new_block.add(transaction.id)
 
             from_address = transaction.from_address
             to_address   = transaction.to_address

@@ -12,13 +12,12 @@ SERVICE_NAME = 'Miner'
 STOP_WORKING = None
 
 class BlockMiner(Thread):
-    def __init__(self, key, work_queue, difficulty, block_size, block_reward, block_reward_from_address, shutdown_event,
+    def __init__(self, key, work_queue, difficulty, block_reward, block_reward_from_address, shutdown_event,
                  stop_mining_event, on_new_block):
         Thread.__init__(self)
         self.key = key
         self.work_queue = work_queue
         self.required_leading_zero_bits = difficulty
-        self.block_size = block_size
         self.block_reward = block_reward
         self.block_reward_from_address = block_reward_from_address
         self.shutdown_event = shutdown_event

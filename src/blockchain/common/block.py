@@ -11,7 +11,7 @@ class Block:
     def is_mineable(self):
         if self.previous_block_id == config.get('genesis_block_id'):
             return True
-        return len(self.transactions) == config.get('block_size')
+        return len(self.transactions) >= config.get('block_size') - 1 # mining reward transaction will be added
 
     def add(self, transaction):
         self.transactions.append(transaction) # TODO validation, has id and signature

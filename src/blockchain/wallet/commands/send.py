@@ -40,7 +40,7 @@ class SendCommand:
                 amount = float(amount_txt)
 
                 if balance < amount:
-                    logging.error('insufficient funds') #TODO improve msg
+                    logging.error('Insufficient funds, current balance for this address is {}'.format(balance))
 
                 else:
                     to_address_key = crypto.get_key(to_address_or_key)

@@ -38,10 +38,9 @@ class MiningServer:
         key = crypto.get_key(KEY_NAME) or crypto.generate_key(KEY_NAME)
         self.work_queue = Queue()
         difficulty = config.get('difficulty')
-        block_size = config.get('block_size')
         block_reward = config.get('block_reward')
         block_reward_from_address = config.get('block_reward_from')
-        self.block_miner = BlockMiner(key, self.work_queue, difficulty, block_size, block_reward, block_reward_from_address,
+        self.block_miner = BlockMiner(key, self.work_queue, difficulty, block_reward, block_reward_from_address,
                                       self.shutdown_event, self.stop_mining_event, self._on_new_block_mined)
 
         transaction_listener_port = config.get('transaction_port')

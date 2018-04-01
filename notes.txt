@@ -24,7 +24,6 @@ Miner
 
 TODO
 ----
-* better validation when adding new blocks
 * BlockchainUpdater does not handle chain forking correctly
 * TODOs in code
 

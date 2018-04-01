@@ -1,5 +1,6 @@
 from blockchain.common.utils import text_to_bytes, bytes_to_text
 from blockchain.common.hash import hash
+from blockchain.common.config import config
 
 class Key:
     K = ''
@@ -9,6 +10,7 @@ class Key:
         self.key           = key
         self.key_file_path = key_file_path
         self.address       = address
+        self.key_format    = config.get('key_format')
 
     def __prepare_data_for_signing(self, data):
         if isinstance(data, str):
@@ -22,7 +24,7 @@ class Key:
         return self.key.verify(self.__prepare_data_for_signing(unsigned_data), (signature, Key.K))
 
     def get_public_key(self):
-        return bytes_to_text(self.key.publickey().exportKey('PEM')) #TODO duplication
+        return bytes_to_text(self.key.publickey().exportKey(self.key_format.upper()))
 
     def __repr__(self):
         return '{} {}'.format(self.name, self.address)

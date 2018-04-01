@@ -1,6 +1,5 @@
 from threading import Thread
 import logging
-import math
 from blockchain.common.hash import hash_string, hash_string_to_hex
 from blockchain.common.encoders import block_encode
 from blockchain.common.block import Block
@@ -53,15 +52,15 @@ class BlockMiner(Thread):
 
             transaction = work_item
             if not Crypto.validate_transaction(transaction):
-                logging.warning('{} received invalid transaction (invalid signature)'.format(SERVICE_NAME))
+                logging.debug('{} received invalid transaction (invalid signature)'.format(SERVICE_NAME))
                 continue
 
             if self.current_unmined_block.has_transaction(transaction):
-                logging.info('{} ignoring transaction, already added to current block'.format(SERVICE_NAME))
+                logging.debug('{} ignoring transaction, already added to current block'.format(SERVICE_NAME))
                 continue
 
             if self._is_transaction_already_in_blockchain(transaction):
-                logging.info('{} ignoring transaction, already in blockchain'.format(SERVICE_NAME))
+                logging.debug('{} ignoring transaction, already in blockchain'.format(SERVICE_NAME))
                 continue
 
             self.current_unmined_block.add(transaction)
@@ -88,30 +87,7 @@ class BlockMiner(Thread):
         while not self.shutdown_event.is_set() and not self.stop_mining_event.is_set():
             block.nonce = nonce
 
-            hash_as_bytes = hash_string(block_encode(block))
-            leading_zero_bits = self._count_leading_zero_bits_in_bytes(hash_as_bytes)
-
-            if leading_zero_bits >= self.required_leading_zero_bits:
-                block.nonce = nonce
+            if block.is_mined():
                 return block
 
             nonce += 1
-
-    def _count_leading_zero_bits_in_bytes(self, bytes):
-        count = 0
-
-        for b in bytes:
-            leading_zero_bits_in_byte = self._count_leading_zero_bits_in_byte(b)
-            count += leading_zero_bits_in_byte
-            if leading_zero_bits_in_byte < 8:
-                return count
-
-        return count
-
-    def _count_leading_zero_bits_in_byte(self, b):
-        return 8 - math.floor(math.log(b, 2)) - 1 if b else 8
-
-    def is_mined(self, block):
-        block_hash_bytes = hash_string(block_encode(block))
-        leading_zero_bits = self._count_leading_zero_bits_in_bytes(block_hash_bytes)
-        return leading_zero_bits >= self.required_leading_zero_bits

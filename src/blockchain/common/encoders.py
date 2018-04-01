@@ -41,8 +41,11 @@ def block_decode(block_json):
     block_dict = json.loads(block_json)
     return block_from_dict(block_dict)
 
-def block_encode(block):
-    return json.dumps(block_to_dict(block), sort_keys=True)
+def block_encode(block, include_id = True):
+    block_dict = block_to_dict(block)
+    if not include_id:
+        block_dict['id'] = None
+    return json.dumps(block_dict, sort_keys=True)
 
 def block_list_decode(block_list_json):
     block_list = json.loads(block_list_json)

@@ -40,7 +40,8 @@ class Blockchain:
         if not new_block.is_mineable():
             raise ValueError('Refused to add new block, block is not mineable')
 
-        #TODO check block difficulty
+        if not new_block.is_mined():
+            raise ValueError('Refused to add new block, block has not been mined correctly')
 
         address_balances = dict(self.address_balances)
         transaction_index = 0
